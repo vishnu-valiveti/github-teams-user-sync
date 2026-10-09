@@ -83,20 +83,22 @@ describe('OrgConfigClass', () => {
       team1.DisplayName,
       team2.Name,
       securityManagerTeam.DisplayName,
+      orgOwnersTeam.DisplayName,
       orgMembersTeam.DisplayName
     ];
     const displayNameMap = new Map<string,string>();
     displayNameMap.set(team1.DisplayName!, team1.Name);
     displayNameMap.set(team2.Name, team2.Name);
+    displayNameMap.set(orgOwnersTeam.DisplayName!, orgOwnersTeam.Name);
     displayNameMap.set(securityManagerTeam.DisplayName!, securityManagerTeam.Name);
     displayNameMap.set(orgMembersTeam.DisplayName!, orgMembersTeam.Name);
 
     expect(config.DisplayNameToSourceMap).toStrictEqual(displayNameMap);        
     expect(config.TeamsToManage).toStrictEqual(expectedTeamsToManage);    
-    expect(config.TeamsToManage).toHaveLength(4);
+    expect(config.TeamsToManage).toHaveLength(5);
   });
 
-  test('Ignores OrgOwnersGroup being a string', () => {
+  test('Handles OrgOwnersGroup being a string', () => {
     // Arrange
     const orgOwnersGroup = "SomeGroup";
     const rawConfig:OrgConfigurationOptions = {
@@ -107,10 +109,12 @@ describe('OrgConfigClass', () => {
     const config = new OrgConfig(rawConfig);
 
     // Assert        
-    expect(config.OrgOwnersGroupName).toBeUndefined();
-    expect(config.DisplayNameToSourceMap).toStrictEqual(new Map<string,string>());
-    expect(config.TeamsToManage).toStrictEqual([]);
-    expect(config.TeamsToManage).toHaveLength(0);
+    const expectedTeamsToManage = [orgOwnersGroup];
+    const displayNameMap = new Map<string,string>();
+    displayNameMap.set(orgOwnersGroup, orgOwnersGroup);    
+    expect(config.OrgOwnersGroupName).toStrictEqual(orgOwnersGroup);
+    expect(config.TeamsToManage).toStrictEqual(expectedTeamsToManage);
+    expect(config.TeamsToManage).toHaveLength(1);
   });
 
   test('Handles OrgMembersGroup being a string', () => {

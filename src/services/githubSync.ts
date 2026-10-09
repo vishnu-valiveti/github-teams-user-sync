@@ -353,6 +353,8 @@ async function syncOrg(installedGitHubClient: IInstalledClient, appConfig: AppCo
 
     Log(JSON.stringify(orgConfig));
 
+    // OrganizationOwnersGroup sync is disabled. OrgConfig always reports it as undefined,
+    // so no owners team is created, synced, or promoted to the 'admin' org role.
     const ownerGroupName = orgConfig.OrgOwnersGroupName;
     const membersGroupName = orgConfig.OrgMembersGroupName;
     const { teamsToManage: gitHubTeams, ignoredTeams } = RemoveTeamsToIgnore(orgConfig.TeamsToManage, appConfig);
@@ -362,7 +364,7 @@ async function syncOrg(installedGitHubClient: IInstalledClient, appConfig: AppCo
     const teamsThatShouldExist: string[] = [
         ...securityManagerTeams,
         ...gitHubTeams,
-        ...(ownerGroupName != undefined ? [ownerGroupName] : []),
+        // ...(ownerGroupName != undefined ? [ownerGroupName] : []),
         ...(membersGroupName != undefined ? [membersGroupName] : [])
     ]
 
@@ -439,31 +441,36 @@ async function syncOrg(installedGitHubClient: IInstalledClient, appConfig: AppCo
     await Promise.all(teamSyncPromises);
     log("", "TeamSync", "Completed");
 
+    // Org owner synchronization is intentionally disabled.
+    // Nothing configured under 'OrganizationOwnersGroup' is granted the 'admin' org role.
+    // if (ownerGroupName) {
+    //     log("", "OrgOwnerSync", "Started");
+    //     const teamMembers = await installedGitHubClient.ListCurrentMembersOfGitHubTeam(ownerGroupName);
+
+    //     if (!teamMembers.successful) {
+    //         return {
+    //             ...response,
+    //             status: "failed"
+    //         }
+    //     }
+
+    //     for (const id of teamMembers.data) {
+    //         Log(JSON.stringify({
+    //             message: `Adding Org Owner`,
+    //             org: installedGitHubClient.GetCurrentOrgName(),
+    //             gitHubUser: id
+    //         }))
+    //         await installedGitHubClient.SetOrgRole(id, "admin");
+
+    //         response = {
+    //             ...response,
+    //             orgOwnersGroup: ownerGroupName
+    //         }
+    //     }
+    //     log("", "OrgOwnerSync", "Completed");
+    // }
     if (ownerGroupName) {
-        log("", "OrgOwnerSync", "Started");
-        const teamMembers = await installedGitHubClient.ListCurrentMembersOfGitHubTeam(ownerGroupName);
-
-        if (!teamMembers.successful) {
-            return {
-                ...response,
-                status: "failed"
-            }
-        }
-
-        for (const id of teamMembers.data) {
-            Log(JSON.stringify({
-                message: `Adding Org Owner`,
-                org: installedGitHubClient.GetCurrentOrgName(),
-                gitHubUser: id
-            }))
-            await installedGitHubClient.SetOrgRole(id, "admin");
-
-            response = {
-                ...response,
-                orgOwnersGroup: ownerGroupName
-            }
-        }
-        log("", "OrgOwnerSync", "Completed");
+        log("", "OrgOwnerSync", "Skipped");
     }
 
     log("", "AddCopilotSubscriptions", "Started");

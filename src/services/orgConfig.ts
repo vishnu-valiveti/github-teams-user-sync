@@ -48,17 +48,21 @@ export class OrgConfig {
     }
 
     private GetOrgOwnersGroupName(): string | undefined {
-        const group = this.options.OrganizationOwnersGroup;
+        // Org owner sync is intentionally disabled: any group configured under
+        // `OrganizationOwnersGroup` is ignored and never synced.
+        return undefined;
 
-        if (!group) {
-            return undefined;
-        }
-
-        if (typeof group == "string") {
-            return group;
-        }
-
-        return group.DisplayName ?? group.Name;
+        // const group = this.options.OrganizationOwnersGroup;
+        //
+        // if (!group) {
+        //     return undefined;
+        // }
+        //
+        // if (typeof group == "string") {
+        //     return group;
+        // }
+        //
+        // return group.DisplayName ?? group.Name;
     }
 
     private GetOrganizationMembersGroupName(): string | undefined {
@@ -95,7 +99,9 @@ export class OrgConfig {
     }
 
     private GetSourceTeamMap(): Map<string, string> {
-        const owners = ConvertTeamToManagedTeam(this.options.OrganizationOwnersGroup);
+        // Org owner sync is disabled, so `OrganizationOwnersGroup` is not mapped.
+        // const owners = ConvertTeamToManagedTeam(this.options.OrganizationOwnersGroup);
+        const owners = undefined;
         const members = ConvertTeamToManagedTeam(this.options.OrganizationMembersGroup);
         const allManaged = this.options.Teams ?? [];
         const allSecurityMembers = this.options.AdditionalSecurityManagerGroups ?? [];

@@ -47,18 +47,22 @@ export class OrgConfig {
         });
     }
 
+    // OrganizationOwnersGroup sync is disabled: any group configured under
+    // 'OrganizationOwnersGroup' is intentionally ignored and never synced.
     private GetOrgOwnersGroupName(): string | undefined {
-        const group = this.options.OrganizationOwnersGroup;
+        return undefined;
 
-        if (!group) {
-            return undefined;
-        }
+        // const group = this.options.OrganizationOwnersGroup;
 
-        if (typeof group == "string") {
-            return group;
-        }
+        // if (!group) {
+        //     return undefined;
+        // }
 
-        return group.DisplayName ?? group.Name;
+        // if (typeof group == "string") {
+        //     return group;
+        // }
+
+        // return group.DisplayName ?? group.Name;
     }
 
     private GetOrganizationMembersGroupName(): string | undefined {
@@ -80,7 +84,8 @@ export class OrgConfig {
         const list2 = (this.options.Teams ?? []).map(t => {
             return t.DisplayName ?? t.Name
         })
-        const owners = this.GetOrgOwnersGroupName();
+        // OrganizationOwnersGroup is no longer added to the managed team list.
+        // const owners = this.GetOrgOwnersGroupName();
         const members = this.GetOrganizationMembersGroupName();
 
         const allSecurityMembers = this.GetAdditionalSecurityManagerGroupNames();
@@ -89,13 +94,14 @@ export class OrgConfig {
             ...list1,
             ...list2,
             ...allSecurityMembers,
-            ...(owners != undefined ? [owners] : []),
+            // ...(owners != undefined ? [owners] : []),
             ...(members != undefined ? [members] : [])
         ];
     }
 
     private GetSourceTeamMap(): Map<string, string> {
-        const owners = ConvertTeamToManagedTeam(this.options.OrganizationOwnersGroup);
+        // OrganizationOwnersGroup is excluded from the source team map so it never resolves to a source group.
+        // const owners = ConvertTeamToManagedTeam(this.options.OrganizationOwnersGroup);
         const members = ConvertTeamToManagedTeam(this.options.OrganizationMembersGroup);
         const allManaged = this.options.Teams ?? [];
         const allSecurityMembers = this.options.AdditionalSecurityManagerGroups ?? [];
@@ -107,7 +113,7 @@ export class OrgConfig {
         });
 
         const fullList = [
-            ...(owners != undefined ? [owners] : []),
+            // ...(owners != undefined ? [owners] : []),
             ...(members != undefined ? [members] : []),
             ...allManaged,
             ...allOther,
